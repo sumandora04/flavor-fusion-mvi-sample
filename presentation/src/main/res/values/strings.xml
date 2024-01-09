@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">Flavor Fusion</string>
+    <string name="back_to_previous_screen">Back to previous screen</string>
+    <string name="cooking_instruction">Cooking Instruction</string>
+    <string name="meal_category_name">%1$s Meals</string>
+    <string name="idle_state_message">No meals available</string>
+    <string name="default_error_msg">Something went wrong!</string>
+</resources>
