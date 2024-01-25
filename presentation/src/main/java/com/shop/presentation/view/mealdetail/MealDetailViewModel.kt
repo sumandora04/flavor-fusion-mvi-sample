@@ -4,18 +4,20 @@ import androidx.lifecycle.viewModelScope
 import com.shop.domain.architecture.Events
 import com.shop.domain.feature.mealdetail.usecase.GetMealDetailUseCase
 import com.shop.presentation.architecture.viewmodel.BaseViewModel
-import com.shop.presentation.architecture.viewmodel.ViewIntent
+import com.shop.presentation.view.mealdetail.mapper.MealDetailDomainToPresentationMapper
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class MealDetailViewModel @Inject constructor(private val useCase: GetMealDetailUseCase) :
-    BaseViewModel<MealsDetailState, MealDetailIntent>(MealsDetailState.Loading) {
+class MealDetailViewModel @Inject constructor(
+    private val useCase: GetMealDetailUseCase,
+    private val mealDetailMapper: MealDetailDomainToPresentationMapper
+) : BaseViewModel<MealsDetailState, MealDetailIntent, MealDetailSideEffect>(
+    MealsDetailState.Loading
+) {
 
-    override fun handleIntent(intent: ViewIntent) {
+    override fun handleIntent(intent: MealDetailIntent) {
         when (intent) {
             is MealDetailIntent.FetchMealDetailById -> fetchMealDetailById(intent.mealId)
         }
@@ -23,31 +25,28 @@ class MealDetailViewModel @Inject constructor(private val useCase: GetMealDetail
 
     private fun fetchMealDetailById(mealId: String) {
         viewModelScope.launch {
-            useCase.invoke(mealId).onEach {
+            emitState(MealsDetailState.Loading)
+            useCase(mealId).collect {
                 when (it) {
-                    is Events.Loading -> {
-                        setState(MealsDetailState.Loading)
-                    }
-
                     is Events.Success -> {
-                        setState(
-                            try {
+                        try {
+                            it.data?.let { mealDetail ->
                                 MealsDetailState.MealDetailSuccess(
-                                    it.data!!
+                                    mealDetailMapper.mealDetailToPresentationMealDetail(
+                                        mealDetail
+                                    )
                                 )
-                            } catch (e: Exception) {
-                                MealsDetailState.Error(e.localizedMessage)
                             }
-                        )
+                        } catch (e: Exception) {
+                            MealsDetailState.Error(e.localizedMessage)
+                        }?.let { mealDetailState -> emitState(mealDetailState) }
                     }
 
                     is Events.Error   -> {
-                        setState(MealsDetailState.Error(it.message))
+                        emitState(MealsDetailState.Error(it.message))
                     }
                 }
-            }.launchIn(viewModelScope)
+            }
         }
     }
-
-
 }

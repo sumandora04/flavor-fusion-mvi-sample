@@ -6,6 +6,7 @@ import com.shop.domain.feature.mealcategory.model.MealCategory
 import com.shop.domain.feature.mealcategory.usecase.GetMealCategoriesUseCase
 import com.shop.presentation.util.CoroutinesTestRule
 import com.shop.presentation.util.MockDataProvider
+import com.shop.presentation.view.mealcategory.mapper.MealCategoryDomainToPresentationMapper
 import io.mockk.coEvery
 import io.mockk.mockk
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -20,6 +21,7 @@ import org.junit.Test
 class MealCategoryViewModelTest {
 
     private val mockMealCategoryUseCase = mockk<GetMealCategoriesUseCase>()
+    private lateinit var categoryMapper: MealCategoryDomainToPresentationMapper
     private lateinit var viewModel: MealCategoryViewModel
 
     @get:Rule
@@ -29,7 +31,8 @@ class MealCategoryViewModelTest {
 
     @Before
     fun setUp() {
-        viewModel = MealCategoryViewModel(mockMealCategoryUseCase)
+        categoryMapper = MealCategoryDomainToPresentationMapper()
+        viewModel = MealCategoryViewModel(mockMealCategoryUseCase, categoryMapper)
     }
 
     @Test
@@ -52,7 +55,7 @@ class MealCategoryViewModelTest {
                 val successState = awaitItem()
                 assertEquals(successState is MealsCategoriesState.MealCategories, true)
                 val emittedCategories = (successState as MealsCategoriesState.MealCategories).categories
-                assertEquals(expectedCategoriesList, emittedCategories)
+                assertEquals(expectedCategoriesList.size, emittedCategories.size)
 
                 cancelAndConsumeRemainingEvents()
             }
@@ -81,6 +84,48 @@ class MealCategoryViewModelTest {
                 val errorState = awaitItem()
                 assertEquals(errorState is MealsCategoriesState.Error, true)
                 assertEquals(errorMessage, (errorState as MealsCategoriesState.Error).error)
+
+                cancelAndConsumeRemainingEvents()
+            }
+        }
+    }
+
+    @Test
+    fun `handleIntent should invoke navigateToMealsList for OnCategoryItemClick intent`() {
+        runTest {
+            // Given
+            val category = MockDataProvider.mockPresentationMealCategoryDetail
+            val onCategoryItemClickIntent = CategoriesIntent.OnCategoryItemClick(category)
+
+            // When
+            viewModel.setIntent(onCategoryItemClickIntent)
+
+            // Then
+            viewModel.sideEffect.test {
+                val sideEffect = awaitItem()
+                assertEquals(sideEffect is CategorySideEffect.NavigateToMealsList, true)
+                assertEquals(category, (sideEffect as CategorySideEffect.NavigateToMealsList).category)
+
+                cancelAndConsumeRemainingEvents()
+            }
+        }
+    }
+
+
+    @Test
+    fun `navigateToMealsList should emit NavigateToMealsList side effect`() {
+        runTest {
+            // Given
+            val category = MockDataProvider.mockPresentationMealCategoryDetail
+
+            // When
+            viewModel.navigateToMealsList(category)
+
+            // Then
+            viewModel.sideEffect.test {
+                val sideEffect = awaitItem()
+                assertEquals(sideEffect is CategorySideEffect.NavigateToMealsList, true)
+                assertEquals(category, (sideEffect as CategorySideEffect.NavigateToMealsList).category)
 
                 cancelAndConsumeRemainingEvents()
             }

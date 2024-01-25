@@ -1,11 +1,14 @@
 package com.shop.data.architecture.di
 
 import com.shop.data.architecture.network.MealsApi
-import com.shop.data.feature.mealdetail.repo.MealDetailRepoImpl
+import com.shop.data.feature.mealcategory.mapper.MealsCategoriesDTOToDomainMapper
 import com.shop.data.feature.mealcategory.repo.MealsCategoryRepoImpl
+import com.shop.data.feature.mealdetail.mapper.MealDetailListDTOToDomainMapper
+import com.shop.data.feature.mealdetail.repo.MealDetailRepoImpl
+import com.shop.data.feature.meallist.mapper.MealsListDTOToDomainMapper
 import com.shop.data.feature.meallist.repo.MealsRepoImpl
-import com.shop.domain.feature.mealdetail.repo.MealDetailRepo
 import com.shop.domain.feature.mealcategory.repo.MealsCategoryRepo
+import com.shop.domain.feature.mealdetail.repo.MealDetailRepo
 import com.shop.domain.feature.meallist.repo.MealsRepo
 import dagger.Module
 import dagger.Provides
@@ -21,6 +24,7 @@ import javax.inject.Singleton
 internal class DataModule {
 
     @Provides
+    @Singleton
     fun provideOkHttpClient(): OkHttpClient {
         return OkHttpClient.Builder().build()
     }
@@ -32,14 +36,30 @@ internal class DataModule {
             .addConverterFactory(GsonConverterFactory.create()).build()
 
     @Provides
+    @Singleton
     fun provideMealsApiService(retrofit: Retrofit): MealsApi = retrofit.create(MealsApi::class.java)
 
     @Provides
-    fun mealRepo(api: MealsApi): MealsRepo = MealsRepoImpl(api)
+    fun providesMealsListDTOToDomainMapper() = MealsListDTOToDomainMapper()
 
     @Provides
-    fun mealCategoryRepo(api: MealsApi): MealsCategoryRepo = MealsCategoryRepoImpl(api)
+    fun mealRepo(api: MealsApi, mealsListDTOToDomainMapper: MealsListDTOToDomainMapper): MealsRepo =
+        MealsRepoImpl(api, mealsListDTOToDomainMapper)
 
     @Provides
-    fun mealDetailRepo(api: MealsApi): MealDetailRepo = MealDetailRepoImpl(api)
+    fun providesMealsCategoriesDTOToDomainMapper() = MealsCategoriesDTOToDomainMapper()
+
+    @Provides
+    fun mealCategoryRepo(
+        api: MealsApi, mealsCategoriesDTOToDomainMapper: MealsCategoriesDTOToDomainMapper
+    ): MealsCategoryRepo = MealsCategoryRepoImpl(api, mealsCategoriesDTOToDomainMapper)
+
+
+    @Provides
+    fun providesMealDetailListDTOToDomainMapper() = MealDetailListDTOToDomainMapper()
+
+    @Provides
+    fun mealDetailRepo(
+        api: MealsApi, mealDetailListDTOToDomainMapper: MealDetailListDTOToDomainMapper
+    ): MealDetailRepo = MealDetailRepoImpl(api, mealDetailListDTOToDomainMapper)
 }

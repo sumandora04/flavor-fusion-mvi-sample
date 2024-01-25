@@ -5,7 +5,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.shop.domain.feature.mealcategory.model.MealCategory
+import com.shop.presentation.view.mealcategory.model.PresentationMealCategory
 import com.shop.presentation.view.mealcategory.ui.MealCategoryRoute
 import com.shop.presentation.view.mealdetail.ui.MealDetailRoute
 import com.shop.presentation.view.meals.ui.MealsByCategoryRoute
@@ -26,11 +26,9 @@ fun Navigation() {
             })
         }
 
-        composable(
-            route = Screen.MealsListByCategory.route
-        ) {
+        composable(route = Screen.MealsListByCategory.route) {
             val category =
-                navController.previousBackStackEntry?.savedStateHandle?.get<MealCategory>(
+                navController.previousBackStackEntry?.savedStateHandle?.get<PresentationMealCategory>(
                     NAV_KEY_MEAL_CATEGORY
                 )
             MealsByCategoryRoute(

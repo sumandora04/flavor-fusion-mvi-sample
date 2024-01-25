@@ -7,6 +7,7 @@ import com.shop.domain.feature.mealdetail.model.MealDetail
 import com.shop.domain.feature.mealdetail.usecase.GetMealDetailUseCase
 import com.shop.presentation.util.CoroutinesTestRule
 import com.shop.presentation.util.MockDataProvider
+import com.shop.presentation.view.mealdetail.mapper.MealDetailDomainToPresentationMapper
 import io.mockk.coEvery
 import io.mockk.mockk
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -21,6 +22,7 @@ import org.junit.Test
 class MealDetailViewModelTest {
 
     private val mockMealDetailUseCase = mockk<GetMealDetailUseCase>()
+    private lateinit var mealDetailMapper:MealDetailDomainToPresentationMapper
     private lateinit var viewModel: MealDetailViewModel
 
     @get:Rule
@@ -31,7 +33,8 @@ class MealDetailViewModelTest {
 
     @Before
     fun setUp() {
-        viewModel = MealDetailViewModel(mockMealDetailUseCase)
+        mealDetailMapper = MealDetailDomainToPresentationMapper()
+        viewModel = MealDetailViewModel(mockMealDetailUseCase, mealDetailMapper)
     }
 
     @Test
@@ -45,17 +48,13 @@ class MealDetailViewModelTest {
 
         // Then
         viewModel.state.test {
-            // Wait for Idle and Loading events
             assertEquals(awaitItem(), MealsDetailState.Loading)
-
-            // Wait for Success state
             val successState = awaitItem() as MealsDetailState.MealDetailSuccess
-            assertEquals(expectedMealDetail, successState.mealDetail)
-
-            // Ensure no more events are emitted
+            assertEquals(
+                mealDetailMapper.mealDetailToPresentationMealDetail(expectedMealDetail),
+                successState.mealDetail
+            )
             expectNoEvents()
-
-            // Consume any remaining events to avoid test failures
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -73,17 +72,10 @@ class MealDetailViewModelTest {
 
             // Then
             viewModel.state.test {
-                // Wait for Idle and Loading events
                 assertEquals(awaitItem(), MealsDetailState.Loading)
-
-                // Wait for Error state
                 val errorState = awaitItem() as MealsDetailState.Error
                 assertEquals(errorMessage, errorState.error)
-
-                // Ensure no more events are emitted
                 expectNoEvents()
-
-                // Consume any remaining events to avoid test failures
                 cancelAndIgnoreRemainingEvents()
             }
         }

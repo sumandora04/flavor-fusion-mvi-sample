@@ -3,6 +3,9 @@ package com.shop.presentation.util
 import com.shop.domain.feature.mealcategory.model.MealCategory
 import com.shop.domain.feature.mealdetail.model.MealDetail
 import com.shop.domain.feature.meallist.model.Meal
+import com.shop.presentation.view.mealcategory.model.PresentationMealCategory
+import com.shop.presentation.view.mealdetail.model.PresentationMealDetail
+import com.shop.presentation.view.meals.model.PresentationMeal
 
 object MockDataProvider {
 
@@ -58,5 +61,47 @@ object MockDataProvider {
     val mockDomainMealsCategories = listOf(
         mockDomainMealCategoryDetail1,
         mockDomainMealCategoryDetail2
+    )
+
+
+
+    val mockPresentationMealCategoryDetail = PresentationMealCategory(
+        categoryId = "2",
+        category = "Chicken",
+        categoryImage = "https://www.themealdb.com/images/category/chicken.png"
+    )
+
+    val mockPresentationMealCategoryDetail1 = PresentationMealCategory(
+        categoryId = "3",
+        category = "Seafood",
+        categoryImage = "https://www.themealdb.com/images/category/Seafood.png"
+    )
+
+    val mockPresentationMealsCategories = listOf(
+        mockPresentationMealCategoryDetail,
+        mockPresentationMealCategoryDetail1
+    )
+
+    val mockPresentationMeal1 = PresentationMeal(
+        mealId = "52959",
+        mealName = "Baked salmon with fennel & tomatoes",
+        mealImage = "https://www.themealdb.com/images/media/meals/1548772327.jpg"
+    )
+
+    val mockPresentationMeal2 = PresentationMeal(
+        mealId = "52819",
+        mealName = "Cajun spiced fish tacos",
+        mealImage = "https://www.themealdb.com/images/media/meals/uvuyxu1503067369.jpg"
+    )
+
+    val mockPresentationMealsList = listOf(mockPresentationMeal1, mockPresentationMeal2)
+
+    val mockPresentationMealDetail = PresentationMealDetail(
+        mealId = "52772",
+        mealName = "Teriyaki Chicken Casserole",
+        mealCategory = "Chicken",
+        mealArea = "Japanese",
+        mealImage = "https://www.themealdb.com/images/media/meals/wvpsxx1468256321.jpg",
+        instructions = "Cooking Instruction for Teriyaki Chicken Casserole"
     )
 }

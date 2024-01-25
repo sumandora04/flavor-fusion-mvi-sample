@@ -4,37 +4,42 @@ import androidx.lifecycle.viewModelScope
 import com.shop.domain.architecture.Events
 import com.shop.domain.feature.meallist.usecase.GetMealsUseCase
 import com.shop.presentation.architecture.viewmodel.BaseViewModel
-import com.shop.presentation.architecture.viewmodel.ViewIntent
+import com.shop.presentation.view.meals.mapper.MealsDomainToPresentationMapper
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class MealsByCategoryViewModel @Inject constructor(
-    private val useCase: GetMealsUseCase
-) : BaseViewModel<MealsByCategoryState, MealsByCategoryIntent>(MealsByCategoryState.Loading) {
+    private val useCase: GetMealsUseCase,
+    private val mealsListMapper: MealsDomainToPresentationMapper
+) : BaseViewModel<MealsByCategoryState, MealsByCategoryIntent, MealsByCategorySideEffect>(
+    MealsByCategoryState.Loading
+) {
 
-    override fun handleIntent(intent: ViewIntent) {
+    override fun handleIntent(intent: MealsByCategoryIntent) {
         when (intent) {
             is MealsByCategoryIntent.FetchMealsByCategory -> fetchMealsByCategory(intent.categoryName)
+            is MealsByCategoryIntent.OnMealItemClick      -> navigateToMealDetail(intent.mealId)
+        }
+    }
+
+    fun navigateToMealDetail(mealId: String) {
+        viewModelScope.launch {
+            emitEffect(MealsByCategorySideEffect.NavigateToMealDetail(mealId))
         }
     }
 
     private fun fetchMealsByCategory(category: String) {
         viewModelScope.launch {
-            useCase.invoke(category).onEach {
+            emitState(MealsByCategoryState.Loading)
+            useCase(category).collect {
                 when (it) {
-                    is Events.Loading -> {
-                        setState(MealsByCategoryState.Loading)
-                    }
-
                     is Events.Success -> {
-                        setState(
+                        emitState(
                             try {
                                 MealsByCategoryState.MealsList(
-                                    it.data.orEmpty()
+                                    mealsListMapper.mealListToPresentationMealList(it.data.orEmpty())
                                 )
                             } catch (e: Exception) {
                                 MealsByCategoryState.Error(e.localizedMessage)
@@ -43,10 +48,10 @@ class MealsByCategoryViewModel @Inject constructor(
                     }
 
                     is Events.Error   -> {
-                        setState(MealsByCategoryState.Error(it.message))
+                        emitState(MealsByCategoryState.Error(it.message))
                     }
                 }
-            }.launchIn(viewModelScope)
+            }
         }
     }
 }

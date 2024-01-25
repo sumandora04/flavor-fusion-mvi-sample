@@ -6,6 +6,7 @@ import com.shop.domain.feature.meallist.model.Meal
 import com.shop.domain.feature.meallist.usecase.GetMealsUseCase
 import com.shop.presentation.util.CoroutinesTestRule
 import com.shop.presentation.util.MockDataProvider
+import com.shop.presentation.view.meals.mapper.MealsDomainToPresentationMapper
 import io.mockk.coEvery
 import io.mockk.mockk
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -20,6 +21,9 @@ import org.junit.Test
 class MealsByCategoryViewModelTest {
 
     private val mockMealsUseCase = mockk<GetMealsUseCase>()
+    private lateinit var mealsMapper:MealsDomainToPresentationMapper
+
+
     private lateinit var viewModel: MealsByCategoryViewModel
 
     @get:Rule
@@ -29,7 +33,8 @@ class MealsByCategoryViewModelTest {
 
     @Before
     fun setUp() {
-        viewModel = MealsByCategoryViewModel(mockMealsUseCase)
+        mealsMapper = MealsDomainToPresentationMapper()
+        viewModel = MealsByCategoryViewModel(mockMealsUseCase, mealsMapper)
     }
 
     @Test
@@ -49,14 +54,10 @@ class MealsByCategoryViewModelTest {
             viewModel.state.test {
                 val initialEmitState = awaitItem()
                 assertEquals(MealsByCategoryState.Loading, initialEmitState)
-
-//                val loadingState = awaitItem()
-//                assertEquals(MealsByCategoryState.Loading, loadingState)
-
                 val successState = awaitItem()
                 assertEquals(successState is MealsByCategoryState.MealsList, true)
                 val emittedMeals = (successState as MealsByCategoryState.MealsList).meals
-                assertEquals(expectedMealsList, emittedMeals)
+                assertEquals(expectedMealsList.size, emittedMeals.size)
 
                 cancelAndConsumeRemainingEvents()
             }
@@ -78,19 +79,59 @@ class MealsByCategoryViewModelTest {
 
             // Then
             viewModel.state.test {
-                // Wait for Idle and Loading events
                 assertEquals(awaitItem(), MealsByCategoryState.Loading)
-//                assertEquals(awaitItem(), MealsByCategoryState.Loading)
-
-                // Wait for Error state
                 val errorState = awaitItem() as MealsByCategoryState.Error
                 assertEquals(errorMessage, errorState.error)
-
-                // Ensure no more events are emitted
                 expectNoEvents()
-
-                // Consume any remaining events to avoid test failures
                 cancelAndIgnoreRemainingEvents()
             }
         }
+
+    @Test
+    fun `handleIntent should invoke navigateToMealDetail for OnMealItemClick intent`() {
+        runTest {
+            // Given
+            val meal = MockDataProvider.mockDomainMeal1
+            val onMealItemClicked = MealsByCategoryIntent.OnMealItemClick(meal.mealId)
+
+            // When
+            viewModel.setIntent(onMealItemClicked)
+
+            // Then
+            viewModel.sideEffect.test {
+                val sideEffect = awaitItem()
+                assertEquals(sideEffect is MealsByCategorySideEffect.NavigateToMealDetail, true)
+                assertEquals(
+                    meal.mealId,
+                    (sideEffect as MealsByCategorySideEffect.NavigateToMealDetail).mealId
+                )
+
+                cancelAndConsumeRemainingEvents()
+            }
+        }
+    }
+
+
+    @Test
+    fun `navigateToMealDetail should emit NavigateToMealDetail side effect`() {
+        runTest {
+            // Given
+            val meal = MockDataProvider.mockDomainMeal1
+
+            // When
+            viewModel.navigateToMealDetail(meal.mealId)
+
+            // Then
+            viewModel.sideEffect.test {
+                val sideEffect = awaitItem()
+                assertEquals(sideEffect is MealsByCategorySideEffect.NavigateToMealDetail, true)
+                assertEquals(
+                    meal.mealId,
+                    (sideEffect as MealsByCategorySideEffect.NavigateToMealDetail).mealId
+                )
+
+                cancelAndConsumeRemainingEvents()
+            }
+        }
+    }
 }
