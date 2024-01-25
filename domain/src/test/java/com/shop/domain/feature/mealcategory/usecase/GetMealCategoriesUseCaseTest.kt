@@ -13,7 +13,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 
-class GetMealCategoriesUseCaseImplTest {
+class GetMealCategoriesUseCaseTest {
 
     private var mockMealsCategoryRepo = mockk<MealsCategoryRepo>()
     private var mockDispatchersProvider = DefaultDispatchersProvider()
@@ -21,11 +21,11 @@ class GetMealCategoriesUseCaseImplTest {
 
     @Before
     fun setup() {
-        useCase = GetMealCategoriesUseCaseImpl(mockMealsCategoryRepo, mockDispatchersProvider)
+        useCase = GetMealCategoriesUseCase(mockMealsCategoryRepo, mockDispatchersProvider)
     }
 
     @Test
-    fun `invoke should emit Loading and Success events with meals categories`() = runTest {
+    fun `invoke should emit Success event with meals categories`() = runTest {
         // Given
         val mockMealCategories = MockDataProvider.mockDomainMealsCategories
         coEvery { mockMealsCategoryRepo.getMealsCategory() } returns mockMealCategories
@@ -39,13 +39,12 @@ class GetMealCategoriesUseCaseImplTest {
         // Then
         coVerify { mockMealsCategoryRepo.getMealsCategory() }
 
-        assertEquals(events[0] is Events.Loading, true)
-        assertEquals(events[1] is Events.Success, true)
-        assertEquals((events[1] as Events.Success).data, mockMealCategories)
+        assertEquals(events[0] is Events.Success, true)
+        assertEquals((events[0] as Events.Success).data, mockMealCategories)
     }
 
     @Test
-    fun `invoke should emit Loading and Error events when repo throws an exception`() = runTest {
+    fun `invoke should emit Error event when repo throws an exception`() = runTest {
         // Given
         val mockErrorMessage = "Error fetching meals categories"
         coEvery { mockMealsCategoryRepo.getMealsCategory() } throws Exception(mockErrorMessage)
@@ -58,8 +57,7 @@ class GetMealCategoriesUseCaseImplTest {
 
         // Then
         coVerify { mockMealsCategoryRepo.getMealsCategory() }
-        assertEquals(events[0] is Events.Loading, true)
-        assertEquals(events[1] is Events.Error, true)
-        assertEquals((events[1] as Events.Error).message, mockErrorMessage)
+        assertEquals(events[0] is Events.Error, true)
+        assertEquals((events[0] as Events.Error).message, mockErrorMessage)
     }
 }

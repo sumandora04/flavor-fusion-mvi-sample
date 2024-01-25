@@ -13,19 +13,19 @@ import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 
-class GetMealsUseCaseImplTest{
+class GetMealsUseCaseTest{
 
     private var mockMealsRepo = mockk<MealsRepo>()
     private var mockDispatchersProvider = DefaultDispatchersProvider()
-    private lateinit var useCase: GetMealsUseCaseImpl
+    private lateinit var useCase: GetMealsUseCase
 
     @Before
     fun setup() {
-        useCase = GetMealsUseCaseImpl(mockMealsRepo, mockDispatchersProvider)
+        useCase = GetMealsUseCase(mockMealsRepo, mockDispatchersProvider)
     }
 
     @Test
-    fun `invoke should emit Loading and Success events with meals`() = runTest {
+    fun `invoke should emit Success events with meals`() = runTest {
         // Given
         val category = "Chicken"
         val mockMeals = MockDataProvider.mockDomainMealsList
@@ -40,13 +40,12 @@ class GetMealsUseCaseImplTest{
         // Then
         coVerify { mockMealsRepo.getMealsByCategory(category) }
 
-        assertEquals(events[0] is Events.Loading, true)
-        assertEquals(events[1] is Events.Success, true)
-        assertEquals((events[1] as Events.Success).data, mockMeals)
+        assertEquals(events[0] is Events.Success, true)
+        assertEquals((events[0] as Events.Success).data, mockMeals)
     }
 
     @Test
-    fun `invoke should emit Loading and Error events when repo throws an exception`() = runTest {
+    fun `invoke should emit Error events when repo throws an exception`() = runTest {
         // Given
         val category = "Chicken"
         val mockErrorMessage = "Error fetching meals"
@@ -61,8 +60,7 @@ class GetMealsUseCaseImplTest{
         // Then
         coVerify { mockMealsRepo.getMealsByCategory(category) }
 
-        assertEquals(events[0] is Events.Loading, true)
-        assertEquals(events[1] is Events.Error, true)
-        assertEquals((events[1] as Events.Error).message, mockErrorMessage)
+        assertEquals(events[0] is Events.Error, true)
+        assertEquals((events[0] as Events.Error).message, mockErrorMessage)
     }
 }

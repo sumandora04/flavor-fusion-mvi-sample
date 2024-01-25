@@ -1,6 +1,7 @@
 package com.shop.data.mealdetail.repo
 
 import com.shop.data.architecture.network.MealsApi
+import com.shop.data.feature.mealdetail.mapper.MealDetailListDTOToDomainMapper
 import com.shop.data.feature.mealdetail.repo.MealDetailRepoImpl
 import com.shop.data.util.MockDataProvider
 import com.shop.data.util.MockDataProvider.mockMealDetailListDTO
@@ -12,15 +13,17 @@ import org.junit.Before
 import org.junit.Test
 
 
-class MealDetailRepoImplTest{
+class MealDetailRepoImplTest {
 
     private lateinit var mealsApi: MealsApi
+    private lateinit var mealDetailMapper: MealDetailListDTOToDomainMapper
     private lateinit var mealDetailRepo: MealDetailRepoImpl
 
     @Before
     fun setUp() {
         mealsApi = mockk()
-        mealDetailRepo = MealDetailRepoImpl(mealsApi)
+        mealDetailMapper = MealDetailListDTOToDomainMapper()
+        mealDetailRepo = MealDetailRepoImpl(mealsApi, mealDetailMapper)
     }
 
     @Test

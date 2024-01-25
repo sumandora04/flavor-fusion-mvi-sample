@@ -1,6 +1,7 @@
 package com.shop.data.mealcategory.repo
 
 import com.shop.data.architecture.network.MealsApi
+import com.shop.data.feature.mealcategory.mapper.MealsCategoriesDTOToDomainMapper
 import com.shop.data.feature.mealcategory.repo.MealsCategoryRepoImpl
 import com.shop.data.util.MockDataProvider
 import io.mockk.coEvery
@@ -13,12 +14,14 @@ import org.junit.Test
 class MealsCategoryRepoImplTest{
 
     private lateinit var mealsApi: MealsApi
+    private lateinit var categoryMapper: MealsCategoriesDTOToDomainMapper
     private lateinit var mealsCategoryRepo: MealsCategoryRepoImpl
 
     @Before
     fun setUp() {
         mealsApi = mockk()
-        mealsCategoryRepo = MealsCategoryRepoImpl(mealsApi)
+        categoryMapper = MealsCategoriesDTOToDomainMapper()
+        mealsCategoryRepo = MealsCategoryRepoImpl(mealsApi, categoryMapper)
     }
 
     @Test
