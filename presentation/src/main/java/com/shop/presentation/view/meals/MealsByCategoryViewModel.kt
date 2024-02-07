@@ -2,6 +2,7 @@ package com.shop.presentation.view.meals
 
 import androidx.lifecycle.viewModelScope
 import com.shop.domain.architecture.Events
+import com.shop.domain.feature.meallist.model.Meal
 import com.shop.domain.feature.meallist.usecase.GetMealsUseCase
 import com.shop.presentation.architecture.viewmodel.BaseViewModel
 import com.shop.presentation.view.meals.mapper.MealsDomainToPresentationMapper
@@ -33,23 +34,21 @@ class MealsByCategoryViewModel @Inject constructor(
     private fun fetchMealsByCategory(category: String) {
         viewModelScope.launch {
             emitState(MealsByCategoryState.Loading)
-            useCase(category).collect {
-                when (it) {
-                    is Events.Success -> {
-                        emitState(
-                            try {
-                                MealsByCategoryState.MealsList(
-                                    mealsListMapper.mealListToPresentationMealList(it.data.orEmpty())
-                                )
-                            } catch (e: Exception) {
-                                MealsByCategoryState.Error(e.localizedMessage)
-                            }
-                        )
-                    }
+            when (val result: Events<List<Meal>> = useCase(category)) {
+                is Events.Success -> {
+                    emitState(
+                        try {
+                            MealsByCategoryState.MealsList(
+                                mealsListMapper.mealListToPresentationMealList(result.data.orEmpty())
+                            )
+                        } catch (e: Exception) {
+                            MealsByCategoryState.Error(e.localizedMessage)
+                        }
+                    )
+                }
 
-                    is Events.Error   -> {
-                        emitState(MealsByCategoryState.Error(it.message))
-                    }
+                is Events.Error   -> {
+                    emitState(MealsByCategoryState.Error(result.message))
                 }
             }
         }

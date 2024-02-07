@@ -4,6 +4,6 @@ import com.shop.presentation.architecture.viewmodel.ViewIntent
 
 sealed interface MealsByCategoryIntent : ViewIntent {
     data class FetchMealsByCategory(val categoryName: String) : MealsByCategoryIntent
-    class OnMealItemClick(val mealId: String) : MealsByCategoryIntent
+    data class OnMealItemClick(val mealId: String) : MealsByCategoryIntent
 
 }

@@ -5,5 +5,5 @@ import com.shop.presentation.view.mealcategory.model.PresentationMealCategory
 
 sealed interface CategoriesIntent: ViewIntent {
     data object FetchMealsCategories : CategoriesIntent
-    class OnCategoryItemClick(val category: PresentationMealCategory) : CategoriesIntent
+    data class OnCategoryItemClick(val category: PresentationMealCategory) : CategoriesIntent
 }

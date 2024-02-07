@@ -4,5 +4,5 @@ import com.shop.presentation.architecture.viewmodel.SideEffect
 import com.shop.presentation.view.mealcategory.model.PresentationMealCategory
 
 sealed interface CategorySideEffect : SideEffect {
-    class NavigateToMealsList(val category:PresentationMealCategory): CategorySideEffect
+    data class NavigateToMealsList(val category:PresentationMealCategory): CategorySideEffect
 }

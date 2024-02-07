@@ -2,11 +2,9 @@ package com.shop.domain.feature.mealcategory.usecase
 
 import com.shop.domain.architecture.Events
 import com.shop.domain.architecture.coroutinecontext.DefaultDispatchersProvider
-import com.shop.domain.feature.mealcategory.model.MealCategory
 import com.shop.domain.feature.mealcategory.repo.MealsCategoryRepo
 import com.shop.domain.util.MockDataProvider
 import io.mockk.coEvery
-import io.mockk.coVerify
 import io.mockk.mockk
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -31,16 +29,12 @@ class GetMealCategoriesUseCaseTest {
         coEvery { mockMealsCategoryRepo.getMealsCategory() } returns mockMealCategories
 
         // When
-        val events = mutableListOf<Events<List<MealCategory>>>()
-        useCase(Unit).collect {
-            events.add(it)
-        }
+        val result = useCase.invoke(Unit)
 
         // Then
-        coVerify { mockMealsCategoryRepo.getMealsCategory() }
-
-        assertEquals(events[0] is Events.Success, true)
-        assertEquals((events[0] as Events.Success).data, mockMealCategories)
+        coEvery { mockMealsCategoryRepo.getMealsCategory() }
+        assertEquals(result is Events.Success, true)
+        assertEquals((result as Events.Success).data, mockMealCategories)
     }
 
     @Test
@@ -50,14 +44,11 @@ class GetMealCategoriesUseCaseTest {
         coEvery { mockMealsCategoryRepo.getMealsCategory() } throws Exception(mockErrorMessage)
 
         // When
-        val events = mutableListOf<Events<List<MealCategory>>>()
-        useCase(Unit).collect {
-            events.add(it)
-        }
+        val result = useCase.invoke(Unit)
 
         // Then
-        coVerify { mockMealsCategoryRepo.getMealsCategory() }
-        assertEquals(events[0] is Events.Error, true)
-        assertEquals((events[0] as Events.Error).message, mockErrorMessage)
+        coEvery { mockMealsCategoryRepo.getMealsCategory() }
+        assertEquals(result is Events.Error, true)
+        assertEquals((result as Events.Error).message, mockErrorMessage)
     }
 }

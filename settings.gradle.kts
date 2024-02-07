@@ -1,5 +1,4 @@
 pluginManagement {
-    includeBuild("gradle-dependencies-manager")
     repositories {
         google()
         mavenCentral()

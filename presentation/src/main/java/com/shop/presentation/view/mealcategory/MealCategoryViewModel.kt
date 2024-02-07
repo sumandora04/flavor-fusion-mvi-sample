@@ -2,6 +2,7 @@ package com.shop.presentation.view.mealcategory
 
 import androidx.lifecycle.viewModelScope
 import com.shop.domain.architecture.Events
+import com.shop.domain.feature.mealcategory.model.MealCategory
 import com.shop.domain.feature.mealcategory.usecase.GetMealCategoriesUseCase
 import com.shop.presentation.architecture.viewmodel.BaseViewModel
 import com.shop.presentation.view.mealcategory.mapper.MealCategoryDomainToPresentationMapper
@@ -34,23 +35,21 @@ class MealCategoryViewModel @Inject constructor(
     private fun fetchMealsCategories() {
         viewModelScope.launch {
             emitState(MealsCategoriesState.Loading)
-            useCase(Unit).collect { event ->
-                when (event) {
-                    is Events.Success -> {
-                        emitState(
-                            try {
-                                MealsCategoriesState.MealCategories(event.data.orEmpty().map {
-                                    mealCategoryMapper.mealCategoryToPresenterMealCategory(it)
-                                })
-                            } catch (e: Exception) {
-                                MealsCategoriesState.Error(e.localizedMessage)
-                            }
-                        )
-                    }
+            when (val result: Events<List<MealCategory>> = useCase(Unit)) {
+                is Events.Success -> {
+                    emitState(
+                        try {
+                            MealsCategoriesState.MealCategories(result.data.orEmpty().map {
+                                mealCategoryMapper.mealCategoryToPresenterMealCategory(it)
+                            })
+                        } catch (e: Exception) {
+                            MealsCategoriesState.Error(e.localizedMessage)
+                        }
+                    )
+                }
 
-                    is Events.Error   -> {
-                        emitState(MealsCategoriesState.Error(event.message))
-                    }
+                is Events.Error   -> {
+                    emitState(MealsCategoriesState.Error(result.message))
                 }
             }
         }

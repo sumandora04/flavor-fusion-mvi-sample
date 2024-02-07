@@ -2,7 +2,6 @@ package com.shop.domain.feature.mealdetail.usecase
 
 import com.shop.domain.architecture.Events
 import com.shop.domain.architecture.coroutinecontext.DefaultDispatchersProvider
-import com.shop.domain.feature.mealdetail.model.MealDetail
 import com.shop.domain.feature.mealdetail.repo.MealDetailRepo
 import com.shop.domain.util.MockDataProvider
 import io.mockk.coEvery
@@ -31,16 +30,12 @@ class GetMealDetailUseCaseTest{
         coEvery { mockMealDetailRepo.getMealById(mealId) } returns mockMealDetail
 
         // When
-        val events = mutableListOf<Events<MealDetail>>()
-        useCase(mealId).collect {
-            events.add(it)
-        }
+        val result = useCase.invoke(mealId)
 
         // Then
         coVerify { mockMealDetailRepo.getMealById(mealId) }
-
-        assertEquals(events[0] is Events.Success, true)
-        assertEquals((events[0] as Events.Success).data, mockMealDetail)
+        assertEquals(result is Events.Success, true)
+        assertEquals((result as Events.Success).data, mockMealDetail)
     }
 
     @Test
@@ -51,15 +46,12 @@ class GetMealDetailUseCaseTest{
         coEvery { mockMealDetailRepo.getMealById(mealId) } throws Exception(mockErrorMessage)
 
         // When
-        val events = mutableListOf<Events<MealDetail>>()
-        useCase(mealId).collect {
-            events.add(it)
-        }
+        val result = useCase.invoke(mealId)
 
         // Then
-        coVerify { mockMealDetailRepo.getMealById(mealId) }
+        coEvery { mockMealDetailRepo.getMealById(mealId) }
+        assertEquals(result is Events.Error, true)
+        assertEquals((result as Events.Error).message, mockErrorMessage)
 
-        assertEquals(events[0] is Events.Error, true)
-        assertEquals((events[0] as Events.Error).message, mockErrorMessage)
     }
 }
