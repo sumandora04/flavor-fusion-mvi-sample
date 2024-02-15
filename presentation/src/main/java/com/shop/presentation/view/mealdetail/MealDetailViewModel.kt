@@ -2,8 +2,8 @@ package com.shop.presentation.view.mealdetail
 
 import androidx.lifecycle.viewModelScope
 import com.shop.domain.architecture.Events
+import com.shop.domain.architecture.usecases.UseCase
 import com.shop.domain.feature.mealdetail.model.MealDetail
-import com.shop.domain.feature.mealdetail.usecase.GetMealDetailUseCase
 import com.shop.presentation.architecture.viewmodel.BaseViewModel
 import com.shop.presentation.view.mealdetail.mapper.MealDetailDomainToPresentationMapper
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -12,7 +12,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MealDetailViewModel @Inject constructor(
-    private val useCase: GetMealDetailUseCase,
+    private val useCase: UseCase<String, MealDetail>,
     private val mealDetailMapper: MealDetailDomainToPresentationMapper
 ) : BaseViewModel<MealsDetailState, MealDetailIntent, MealDetailSideEffect>(
     MealsDetailState.Loading
@@ -28,19 +28,15 @@ class MealDetailViewModel @Inject constructor(
             emitState(MealsDetailState.Loading)
             when (val result: Events<MealDetail> = useCase(mealId)) {
                 is Events.Success -> {
-                    try {
-                        result.data?.let { mealDetail ->
-                            MealsDetailState.MealDetailSuccess(
-                                mealDetailMapper.mealDetailToPresentationMealDetail(
-                                    mealDetail
-                                )
+                    result.data?.let { mealDetail ->
+                        MealsDetailState.MealDetailSuccess(
+                            mealDetailMapper.mealDetailToPresentationMealDetail(
+                                mealDetail
                             )
-                        }
-                    } catch (e: Exception) {
-                        MealsDetailState.Error(e.localizedMessage)
-                    }?.let { mealDetailState -> emitState(mealDetailState) }
+                        )
+                    }?.let { emitState(it) }
                 }
-
+                
                 is Events.Error   -> {
                     emitState(MealsDetailState.Error(result.message))
                 }

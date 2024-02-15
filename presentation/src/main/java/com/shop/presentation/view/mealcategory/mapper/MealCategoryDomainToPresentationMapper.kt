@@ -7,9 +7,9 @@ class MealCategoryDomainToPresentationMapper {
     fun mealCategoryToPresenterMealCategory(mealCategory: MealCategory): PresentationMealCategory {
         return with(mealCategory) {
             PresentationMealCategory(
-                categoryId = this.categoryId,
-                category = this.category,
-                categoryImage = this.categoryImage
+                categoryId = categoryId,
+                category = category,
+                categoryImage = categoryImage
             )
         }
     }

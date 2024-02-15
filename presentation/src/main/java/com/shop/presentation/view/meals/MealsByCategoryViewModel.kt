@@ -2,8 +2,8 @@ package com.shop.presentation.view.meals
 
 import androidx.lifecycle.viewModelScope
 import com.shop.domain.architecture.Events
+import com.shop.domain.architecture.usecases.UseCase
 import com.shop.domain.feature.meallist.model.Meal
-import com.shop.domain.feature.meallist.usecase.GetMealsUseCase
 import com.shop.presentation.architecture.viewmodel.BaseViewModel
 import com.shop.presentation.view.meals.mapper.MealsDomainToPresentationMapper
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -12,7 +12,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MealsByCategoryViewModel @Inject constructor(
-    private val useCase: GetMealsUseCase,
+    private val useCase: UseCase<String, List<Meal>>,
     private val mealsListMapper: MealsDomainToPresentationMapper
 ) : BaseViewModel<MealsByCategoryState, MealsByCategoryIntent, MealsByCategorySideEffect>(
     MealsByCategoryState.Loading
@@ -37,13 +37,9 @@ class MealsByCategoryViewModel @Inject constructor(
             when (val result: Events<List<Meal>> = useCase(category)) {
                 is Events.Success -> {
                     emitState(
-                        try {
-                            MealsByCategoryState.MealsList(
-                                mealsListMapper.mealListToPresentationMealList(result.data.orEmpty())
-                            )
-                        } catch (e: Exception) {
-                            MealsByCategoryState.Error(e.localizedMessage)
-                        }
+                        MealsByCategoryState.MealsList(
+                            mealsListMapper.mealListToPresentationMealList(result.data.orEmpty())
+                        )
                     )
                 }
 

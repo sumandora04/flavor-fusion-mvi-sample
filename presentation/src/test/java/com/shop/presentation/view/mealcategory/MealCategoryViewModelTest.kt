@@ -10,7 +10,6 @@ import com.shop.presentation.view.mealcategory.mapper.MealCategoryDomainToPresen
 import io.mockk.coEvery
 import io.mockk.mockk
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Before
@@ -39,10 +38,8 @@ class MealCategoryViewModelTest {
     fun `fetchMealsCategories should update view state with loaded meal categories`() {
         runTest {
             // Given
-            val result = flowOf(Events.Success(expectedCategoriesList))
-            coEvery {
-                mockMealCategoryUseCase.invoke(Unit)
-            } returns result
+            val result = Events.Success(expectedCategoriesList)
+            coEvery { mockMealCategoryUseCase.invoke(Unit) } returns result
 
             // When
             viewModel.setIntent(CategoriesIntent.FetchMealsCategories)
@@ -68,10 +65,8 @@ class MealCategoryViewModelTest {
         runTest {
             // Given
             val errorMessage = "Something went wrong"
-            val result = flowOf(Events.Error<List<MealCategory>>(errorMessage))
-            coEvery {
-                mockMealCategoryUseCase.invoke(Unit)
-            } returns result
+            val result = Events.Error<List<MealCategory>>(errorMessage)
+            coEvery { mockMealCategoryUseCase.invoke(Unit) } returns result
 
             // When
             viewModel.setIntent(CategoriesIntent.FetchMealsCategories)

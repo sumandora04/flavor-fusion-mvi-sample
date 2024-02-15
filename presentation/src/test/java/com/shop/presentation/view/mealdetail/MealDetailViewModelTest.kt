@@ -11,7 +11,6 @@ import com.shop.presentation.view.mealdetail.mapper.MealDetailDomainToPresentati
 import io.mockk.coEvery
 import io.mockk.mockk
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Before
@@ -40,7 +39,7 @@ class MealDetailViewModelTest {
     @Test
     fun `fetchMealDetailById should update view state with loaded meal detail`() = runTest {
         // Given
-        val result = flowOf(Events.Success(expectedMealDetail))
+        val result = Events.Success(expectedMealDetail)
         coEvery { mockMealDetailUseCase.invoke(mealId) } returns result
 
         // When
@@ -64,7 +63,7 @@ class MealDetailViewModelTest {
         runTest {
             // Given
             val errorMessage = "Something went wrong"
-            val result = flowOf(Events.Error<MealDetail>(errorMessage))
+            val result = Events.Error<MealDetail>(errorMessage)
             coEvery { mockMealDetailUseCase.invoke(mealId) } returns result
 
             // When

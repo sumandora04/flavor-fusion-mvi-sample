@@ -12,7 +12,7 @@ class GetMealDetailUseCase @Inject constructor(
     private val mealsRepo: MealDetailRepo, private val dispatchersProvider: DispatchersProvider
 ) : UseCase<String, MealDetail> {
     override suspend operator fun invoke(parameter: String) =
-        withContext(dispatchersProvider.io()) {
+        withContext(dispatchersProvider.io) {
             try {
                 val meal = mealsRepo.getMealById(parameter)
                 Events.Success(meal)

@@ -10,7 +10,6 @@ import com.shop.presentation.view.meals.mapper.MealsDomainToPresentationMapper
 import io.mockk.coEvery
 import io.mockk.mockk
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Before
@@ -42,10 +41,8 @@ class MealsByCategoryViewModelTest {
         runTest {
             // Given
             val category = "Chicken"
-            val result = flowOf(Events.Success(expectedMealsList))
-            coEvery {
-                mockMealsUseCase.invoke(category)
-            } returns result
+            val result = Events.Success(expectedMealsList)
+            coEvery { mockMealsUseCase.invoke(category) } returns result
 
             // When
             viewModel.setIntent(MealsByCategoryIntent.FetchMealsByCategory(category))
@@ -71,7 +68,7 @@ class MealsByCategoryViewModelTest {
             // Given
             val category = "Chicken"
             val errorMessage = "Something went wrong"
-            val result = flowOf(Events.Error<List<Meal>>(errorMessage))
+            val result = Events.Error<List<Meal>>(errorMessage)
             coEvery { mockMealsUseCase.invoke(category) } returns result
 
             // When

@@ -1,14 +1,12 @@
 package com.shop.presentation.architecture.viewmodel
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.launch
 
 /**
  * This interface represents a user interaction with the UI.
@@ -38,9 +36,7 @@ abstract class BaseViewModel<VS : ViewState, VI : ViewIntent, SE : SideEffect>(
     abstract fun handleIntent(intent: VI)
 
     fun setIntent(intent: VI) {
-        viewModelScope.launch {
-            handleIntent(intent)
-        }
+        handleIntent(intent)
     }
 
     protected suspend fun emitState(newState: VS) {

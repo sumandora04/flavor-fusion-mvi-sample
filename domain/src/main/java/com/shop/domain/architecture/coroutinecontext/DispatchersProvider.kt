@@ -3,6 +3,6 @@ package com.shop.domain.architecture.coroutinecontext
 import kotlinx.coroutines.CoroutineDispatcher
 
 interface DispatchersProvider {
-    fun io(): CoroutineDispatcher
-    fun main(): CoroutineDispatcher
+    val io: CoroutineDispatcher
+    val main: CoroutineDispatcher
 }
