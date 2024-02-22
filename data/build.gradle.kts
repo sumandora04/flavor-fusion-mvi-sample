@@ -42,7 +42,6 @@ dependencies {
     implementation (libs.squareup.retrofit2.retrofit)
     implementation (libs.squareup.retrofit2.converter)
     //Coroutine
-    implementation (libs.jetbrains.kotlinx.coroutines.android)
     implementation (libs.jetbrains.kotlinx.coroutines.core)
     //Hilt:
     implementation(libs.dagger.hilt.android)

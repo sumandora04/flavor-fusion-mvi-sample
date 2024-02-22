@@ -20,6 +20,7 @@ import com.shop.presentation.view.mealcategory.model.PresentationMealCategory
 
 
 const val LAUNCHED_EFFECT_KEY = "CATEGORY_LIST"
+
 @Composable
 fun MealCategoryRoute(
     onGoToSelectedItem: (PresentationMealCategory) -> Unit,
@@ -31,14 +32,12 @@ fun MealCategoryRoute(
         mutableStateOf(true)
     }
 
-    if (shouldCallApi){
-        LaunchedEffect(key1 = LAUNCHED_EFFECT_KEY){
+    LaunchedEffect(key1 = LAUNCHED_EFFECT_KEY, shouldCallApi) {
+        if (shouldCallApi) {
             viewModel.setIntent(CategoriesIntent.FetchMealsCategories)
             shouldCallApi = false
         }
-    }
 
-    LaunchedEffect(key1 = LAUNCHED_EFFECT_KEY) {
         viewModel.sideEffect.collect { sideEffect ->
             when (sideEffect) {
                 is CategorySideEffect.NavigateToMealsList -> {
@@ -46,6 +45,7 @@ fun MealCategoryRoute(
                 }
             }
         }
+
     }
 
     AppToolBar(
@@ -53,9 +53,7 @@ fun MealCategoryRoute(
         image = R.mipmap.ic_launcher,
         content = { innerPadding ->
             MealCategoriesScreen(
-                modifier = modifier.padding(innerPadding),
-                state = state,
-                viewModel = viewModel
+                modifier = modifier.padding(innerPadding), state = state, viewModel = viewModel
             )
         },
     )

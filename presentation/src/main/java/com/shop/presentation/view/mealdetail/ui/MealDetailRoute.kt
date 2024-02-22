@@ -31,8 +31,8 @@ fun MealDetailRoute(
         mutableStateOf(true)
     }
 
-    if (shouldCallApi) {
-        LaunchedEffect(key1 = savableMealId) {
+    LaunchedEffect(key1 = savableMealId, shouldCallApi) {
+        if (shouldCallApi) {
             viewModel.setIntent(MealDetailIntent.FetchMealDetailById(savableMealId))
             shouldCallApi = false
         }

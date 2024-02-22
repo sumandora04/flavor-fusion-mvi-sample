@@ -20,8 +20,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import com.shop.presentation.R
+import com.shop.presentation.architecture.ui.theme.DEFAULT_PADDING_SIZE
+import com.shop.presentation.architecture.ui.theme.SIZE_30_DP
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -43,10 +44,10 @@ fun AppToolBar(
                         ImageLoader(
                             imageData = image,
                             Modifier
-                                .size(30.dp)
+                                .size(SIZE_30_DP)
                                 .clip(CircleShape)
                         )
-                        Spacer(modifier = Modifier.width(10.dp))
+                        Spacer(modifier = Modifier.width(DEFAULT_PADDING_SIZE))
                         Text(text = title, style = MaterialTheme.typography.displaySmall)
                     }
                 },

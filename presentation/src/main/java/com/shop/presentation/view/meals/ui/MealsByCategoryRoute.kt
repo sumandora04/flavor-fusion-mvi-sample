@@ -35,8 +35,8 @@ fun MealsByCategoryRoute(
         mutableStateOf(true)
     }
 
-    if (shouldCallApi) {
-        LaunchedEffect(key1 = category) {
+    LaunchedEffect(key1 = category, shouldCallApi) {
+        if (shouldCallApi) {
             viewModel.setIntent(
                 MealsByCategoryIntent.FetchMealsByCategory(
                     categoryName = category.category
@@ -44,15 +44,13 @@ fun MealsByCategoryRoute(
             )
             shouldCallApi = false
         }
-    }
-    LaunchedEffect(key1 = category) {
+
         viewModel.sideEffect.collect { sideEffect ->
             when (sideEffect) {
                 is MealsByCategorySideEffect.NavigateToMealDetail -> {
                     onGoToSelectedItem(sideEffect.mealId)
                 }
             }
-
         }
     }
 

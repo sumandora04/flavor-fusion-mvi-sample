@@ -38,7 +38,6 @@ dependencies {
 
     implementation(libs.androidx.core)
     //Coroutine
-    implementation (libs.jetbrains.kotlinx.coroutines.android)
     implementation (libs.jetbrains.kotlinx.coroutines.core)
     //Hilt:
     implementation(libs.dagger.hilt.android)
